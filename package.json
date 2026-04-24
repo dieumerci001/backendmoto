@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node --env-file=.env index.js",
     "db:sync": "node ./src/scripts/db-sync.js",
-    "db:seed": "node --env-file=.env ./src/scripts/seed.js"
+    "db:seed": "node --env-file=.env ./src/scripts/seed.js",
+    "start":"node --env-file=.env index.js"
   },
   "keywords": [],
   "author": "",
