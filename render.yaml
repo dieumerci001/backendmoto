@@ -3,7 +3,6 @@ services:
   - type: web
     name: moto-backend
     runtime: node
-    plan: free
     buildCommand: npm install
     startCommand: node index.js
     envVars:
@@ -15,13 +14,12 @@ services:
         sync: false
 
   # 2. THE FRONTEND
-  - type: web # Change this from 'static' to 'web'
+  - type: web
     name: moto-frontend
-    runtime: static # This tells Render it's a Static Site
-    plan: free
+    runtime: static
     rootDir: motari-frontend
     buildCommand: npm install && npm run build
-    staticPublishPath: dist # Note: use 'staticPublishPath' for static env
+    staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
         fromService:
