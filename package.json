@@ -8,7 +8,7 @@
     "dev": "node --env-file=.env index.js",
     "db:sync": "node ./src/scripts/db-sync.js",
     "db:seed": "node --env-file=.env ./src/scripts/seed.js",
-    "start":"node --env-file=.env index.js"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
