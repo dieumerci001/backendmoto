@@ -1,5 +1,5 @@
 services:
-  # 1. THE BACKEND (Web Service)
+  # 1. THE BACKEND
   - type: web
     name: moto-backend
     runtime: node
@@ -9,21 +9,19 @@ services:
     envVars:
       - key: PORT
         value: 10000
-      # Use placeholders for secrets; you'll fill them in the Render UI
       - key: DB_PASSWORD
         sync: false
       - key: OPENAI_API_KEY
         sync: false
-      - key: EMAIL_PASS
-        sync: false
 
-  # 2. THE FRONTEND (Static Site)
-  - type: static
+  # 2. THE FRONTEND
+  - type: web # Change this from 'static' to 'web'
     name: moto-frontend
+    runtime: static # This tells Render it's a Static Site
     plan: free
     rootDir: motari-frontend
     buildCommand: npm install && npm run build
-    publishPath: dist # Change to 'build' if you aren't using Vite
+    staticPublishPath: dist # Note: use 'staticPublishPath' for static env
     envVars:
       - key: VITE_API_URL
         fromService:
