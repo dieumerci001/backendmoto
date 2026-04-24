@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node --env-file=.env index.js",
+    "dev": "node  index.js",
+  "start:prod": "node index.js",
+  "build:frontend": "cd motari-frontend && npm install && npm run build",
     "db:sync": "node ./src/scripts/db-sync.js",
     "db:seed": "node --env-file=.env ./src/scripts/seed.js",
     "start": "node index.js"
@@ -32,6 +34,8 @@
     "passport-jwt": "^4.0.1",
     "sequelize": "^6.37.8",
     "socket.io": "^4.8.3",
+    "pg": "^8.11.0",
+    "pg-hstore": "^2.3.4",
     "xlsx": "^0.18.5"
   }
 }

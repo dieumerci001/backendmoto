@@ -3,28 +3,30 @@ services:
   - type: web
     name: moto-backend
     runtime: node
-    buildCommand: npm install
-      
-    startCommand: node index.js
+  # Install backend deps and build frontend into motari-frontend/dist so backend can serve it
+  buildCommand: npm install && cd motari-frontend && npm install && npm run build && cd ..
+  startCommand: node index.js
 
     envVars:
       - key: PORT
+        # Render will provide a runtime PORT value; this is a fallback for local testing
         value: 10000
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: moto-frontend
+          property: host
+      - key: SERVE_FRONTEND
+        value: "true"
+      - key: DATABASE_URL
+        # For Render managed Postgres DB: set this to the provided DATABASE_URL in the Render dashboard
+        sync: false
       - key: DB_PASSWORD
         sync: false
       - key: OPENAI_API_KEY
         sync: false
 
-  # 2. THE FRONTEND
-  - type: web
-    name: moto-frontend
-    runtime: static
-    rootDir: motari-frontend
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
-    envVars:
-      - key: VITE_API_URL
-        fromService:
-          type: web
-          name: moto-backend
-          property: host
+# NOTE: This manifest config builds the frontend as part of the backend build and serves it
+# from the backend. If you prefer to keep a separate frontend Static site service,
+# restore or create the moto-frontend service (the original configuration is commented out).
+

@@ -34,16 +34,32 @@ const app = express();
  
 
 import cors from "cors"; // 1. Import CORS
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// FRONTEND_URL should be set in Render (or fallback to local dev URL)
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+const SERVE_FRONTEND = process.env.SERVE_FRONTEND === 'true';
 
 app.use(cors({
-  origin: "http://localhost:5173", // Allow your frontend
-  credentials: true,               // Allow cookies/headers
-  methods: ["GET", "POST", "PUT", "DELETE"]
+  origin: (origin, callback) => {
+    // allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    // If backend is serving frontend, accept requests from anywhere (frontend will be same origin)
+    if (SERVE_FRONTEND) return callback(null, true);
+    const allowed = [FRONTEND_URL, "http://localhost:5173", "http://127.0.0.1:5173"];
+    if (allowed.indexOf(origin) !== -1) return callback(null, true);
+    if (origin === process.env.BACKEND_HOST) return callback(null, true);
+    return callback(new Error("CORS policy: This origin is not allowed"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 }));
 
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: "http://localhost:5173" } // Best practice: match frontend URL
+  cors: { origin: SERVE_FRONTEND ? true : [FRONTEND_URL, "http://localhost:5173"] }
 });
 
 
@@ -88,11 +104,35 @@ io.on("connection", (socket) => {
   });
 });
 
+// Serve frontend static files if built inside motari-frontend/dist or copied to public/
+// This middleware is placed after API routes so /api/* continues to work.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const frontendDist1 = path.join(__dirname, "motari-frontend", "dist");
+const frontendDist2 = path.join(__dirname, "public");
+let frontendDist = null;
+if (fs.existsSync(frontendDist1)) frontendDist = frontendDist1;
+else if (fs.existsSync(frontendDist2)) frontendDist = frontendDist2;
+
+if (frontendDist) {
+  console.log("Serving frontend from:", frontendDist);
+  app.use(express.static(frontendDist));
+  // SPA fallback
+  app.get('*', (req, res) => {
+    // keep API routes intact
+    if (req.path.startsWith('/api')) return res.status(404).json({ error: 'Not found' });
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+} else if (SERVE_FRONTEND) {
+  console.warn('SERVE_FRONTEND is true but no built frontend found at motari-frontend/dist or public/');
+}
+
+const PORT = process.env.PORT || 5000;
 sequelize.sync({ alter: false }).then(() => {
-  server.listen(5000, () => {
-    console.log("✅ Server running on port 5000");
-    console.log("✅ Database connected:", process.env.DB_HOST);
+  server.listen(PORT, () => {
+    console.log(`✅ Server running on port ${PORT}`);
+    console.log("✅ Database connected:", process.env.DATABASE_URL || process.env.DB_HOST);
   });
 }).catch(err => {
-  console.error("❌ Database connection failed:", err.message);
+  console.error("❌ Database connection failed:", err.message || err);
 });
