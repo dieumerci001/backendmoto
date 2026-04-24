@@ -1,0 +1,36 @@
+{
+  "name": "group",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --env-file=.env index.js",
+    "db:sync": "node ./src/scripts/db-sync.js",
+    "db:seed": "node --env-file=.env ./src/scripts/seed.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1",
+    "mysql2": "^3.22.1",
+    "nodemailer": "^8.0.5",
+    "nodemon": "^3.1.14",
+    "openai": "^6.34.0",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-jwt": "^4.0.1",
+    "sequelize": "^6.37.8",
+    "socket.io": "^4.8.3",
+    "xlsx": "^0.18.5"
+  }
+}
