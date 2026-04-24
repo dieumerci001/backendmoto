@@ -4,7 +4,9 @@ services:
     name: moto-backend
     runtime: node
     buildCommand: npm install
+      
     startCommand: node index.js
+
     envVars:
       - key: PORT
         value: 10000
