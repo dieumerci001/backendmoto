@@ -1,0 +1,32 @@
+services:
+  # 1. THE BACKEND (Web Service)
+  - type: web
+    name: moto-backend
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: PORT
+        value: 10000
+      # Use placeholders for secrets; you'll fill them in the Render UI
+      - key: DB_PASSWORD
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+
+  # 2. THE FRONTEND (Static Site)
+  - type: static
+    name: moto-frontend
+    plan: free
+    rootDir: motari-frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist # Change to 'build' if you aren't using Vite
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: moto-backend
+          property: host
